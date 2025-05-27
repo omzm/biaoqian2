@@ -52,8 +52,8 @@ interface TagItem {
   favicon?: string
   isActive: boolean
   clickCount: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date | null
+  updatedAt: Date | null
 }
 
 interface WebsiteInfo {
@@ -149,8 +149,8 @@ export default function TagWebsite() {
         const parsed = data.map((tag: any) => ({
           ...tag,
           clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0"),
-          createdAt: tag.createdAt ? new Date(tag.createdAt) : null,
-          updatedAt: tag.updatedAt ? new Date(tag.updatedAt) : null,
+          createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
+          updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
         }))
         setTags(parsed)
       })
@@ -1086,7 +1086,11 @@ export default function TagWebsite() {
                       </div>
 
                       <div className="text-xs text-slate-500 bg-slate-50 px-3 py-1 rounded-full">
-                        {tag.createdAt.toLocaleDateString("zh-CN")}
+                        <span className="text-xs text-slate-500">
+                          {tag.createdAt instanceof Date && !isNaN(tag.createdAt.getTime())
+                            ? tag.createdAt.toLocaleDateString("zh-CN")
+                            : "未知时间"}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
