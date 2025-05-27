@@ -1,5 +1,7 @@
 "use client"
 
+export const revalidate = 10
+
 import type React from "react"
 
 import { useState, useRef } from "react"
