@@ -34,56 +34,26 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
           <p className="text-sm text-slate-400">暂无热门标签</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {popularTags.map((tag, index) => {
-              const color = getColorClasses(tag.color)
-              return (
-                <Card
-                  key={tag.id}
-                  onClick={() => onClick(tag)}
-                  className="group cursor-pointer bg-white/80 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className="relative">
-                        <div className={`absolute inset-0 ${color.bg} blur rounded-lg opacity-20`} />
-                        <div className="relative w-8 h-8 bg-white rounded-lg border flex items-center justify-center">
-                          {tag.favicon?.length <= 4 ? (
-                            <span className="text-sm">{tag.favicon}</span>
-                          ) : (
-                            <img
-                              src={tag.favicon || "/placeholder.svg"}
-                              alt={tag.name}
-                              className="w-5 h-5"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement
-                                target.src = "/placeholder.svg?height=20&width=20&query=Website icon"
-                              }}
-                            />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="truncate text-sm font-semibold text-slate-900">{tag.name}</h3>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Badge
-                            variant="secondary"
-                            className={`${color.light} ${color.text} border-0 text-xs px-2 py-0.5`}
-                          >
-                            {tag.category}
-                          </Badge>
-                          <span className="text-xs text-slate-500">#{index + 1}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-slate-500 flex justify-between">
-                      <span>{typeof tag.clickCount === "number" ? tag.clickCount : 0} 次点击</span>
-                      <TrendingUp className="h-3 w-3 text-orange-500" />
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
+  {popularTags.map((tag) => (
+    <div
+      key={tag.id}
+      onClick={() => onClick(tag)}
+      className="flex items-center gap-3 p-3 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition"
+    >
+      <img
+        src={tag.favicon || "/placeholder.svg"}
+        alt={tag.name}
+        className="w-5 h-5 rounded-sm object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement
+          target.src = "/placeholder.svg"
+        }}
+      />
+      <span className="text-sm font-medium truncate">{tag.name}</span>
+    </div>
+  ))}
+</div>
+
         )}
       </div>
 
