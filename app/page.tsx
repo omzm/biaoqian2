@@ -376,7 +376,7 @@ export default function TagWebsite() {
     setShowInactive(false)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name.trim()) return
 
     const now = new Date()
@@ -393,6 +393,13 @@ export default function TagWebsite() {
       createdAt: editingTag ? editingTag.createdAt : now,
       updatedAt: now,
     }
+
+    // 保存到数据库
+    await fetch("/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTag),
+    })
 
     if (editingTag) {
       setTags(tags.map((tag) => (tag.id === editingTag.id ? newTag : tag)))
