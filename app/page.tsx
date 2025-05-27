@@ -468,25 +468,22 @@ export default function TagWebsite() {
   }
 
   const handleClick = (tag: TagItem) => {
-    // 立即打开链接（确保在用户点击事件中执行）
-    if (tag.url) {
-      window.open(tag.url, "_blank", "noopener,noreferrer")
-    }
-
-    // 异步更新点击次数（不阻塞跳转）
     const updated = {
       ...tag,
       clickCount: (tag.clickCount || 0) + 1,
       updatedAt: new Date().toISOString(),
     }
 
-    fetch("/api/tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated),
-    }).then(() => {
-      setTags((prev) => prev.map((t) => (t.id === tag.id ? updated : t)))
-    })
+    // 发起后台统计写入
+    navigator.sendBeacon?.("/api/tags", new Blob([JSON.stringify(updated)], { type: "application/json" }))
+
+    // 然后打开链接（不会中断）
+    if (tag.url) {
+      window.open(tag.url, "_blank", "noopener,noreferrer")
+    }
+
+    // 同步更新本地状态，提升体验
+    setTags((prev) => prev.map((t) => (t.id === tag.id ? updated : t)))
   }
 
   const getColorClasses = (colorIndex: string) => {
