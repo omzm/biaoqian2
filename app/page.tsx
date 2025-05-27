@@ -122,11 +122,13 @@ const colors = [
 const fetchTags = async (): Promise<TagItem[]> => {
   const res = await fetch("/api/tags")
   const data = await res.json()
+
   return data.map((tag: any) => ({
     ...tag,
+    // 修复字段名为数据库原始字段（小写）
     clickCount: typeof tag.clickcount === "number" ? tag.clickcount : Number.parseInt(tag.clickcount || "0"),
-    createdAt: tag.createdat ? new Date(tag.createdat) : new Date(),
-    updatedAt: tag.updatedat ? new Date(tag.updatedat) : new Date(),
+    createdAt: tag.createdat ? new Date(tag.createdat) : null,
+    updatedAt: tag.updatedat ? new Date(tag.updatedat) : null,
   }))
 }
 
