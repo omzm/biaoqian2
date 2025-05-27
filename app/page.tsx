@@ -470,19 +470,19 @@ export default function TagWebsite() {
   }
 
   const handleClick = async (tag: TagItem) => {
-    // 打开链接
+    // 打开链接（不拦截）
     if (tag.url) {
       window.open(tag.url, "_blank", "noopener,noreferrer")
     }
 
-    // 发送点击统计请求
+    // 发请求：让数据库执行 clickCount + 1
     await fetch("/api/click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: tag.id }),
     })
 
-    // 再从数据库拉取最新标签状态
+    // 数据更新后立即重新拉取数据库数据
     await refreshTags()
   }
 
