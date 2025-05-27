@@ -141,19 +141,21 @@ export default function TagWebsite() {
     isActive: true,
   })
 
+  const refreshTags = async () => {
+    const res = await fetch("/api/tags")
+    const data = await res.json()
+    const parsed = data.map((tag: any) => ({
+      ...tag,
+      clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0"),
+      createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
+      updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
+    }))
+    setTags(parsed)
+  }
+
   // 初始化示例数据
   useEffect(() => {
-    fetch("/api/tags")
-      .then((res) => res.json())
-      .then((data) => {
-        const parsed = data.map((tag: any) => ({
-          ...tag,
-          clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0"),
-          createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
-          updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
-        }))
-        setTags(parsed)
-      })
+    refreshTags()
   }, [])
 
   const filteredTags = tags.filter((tag) => {
@@ -467,18 +469,21 @@ export default function TagWebsite() {
     setTags(tags.filter((tag) => tag.id !== id))
   }
 
-  const handleClick = (tag: TagItem) => {
-    // 异步发送点击统计（不修改本地 state，防止覆盖）
-    fetch("/api/click", {
+  const handleClick = async (tag: TagItem) => {
+    // 打开链接
+    if (tag.url) {
+      window.open(tag.url, "_blank", "noopener,noreferrer")
+    }
+
+    // 发送点击统计请求
+    await fetch("/api/click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: tag.id }),
     })
 
-    // 跳转
-    if (tag.url) {
-      window.open(tag.url, "_blank", "noopener,noreferrer")
-    }
+    // 再从数据库拉取最新标签状态
+    await refreshTags()
   }
 
   const getColorClasses = (colorIndex: string) => {
