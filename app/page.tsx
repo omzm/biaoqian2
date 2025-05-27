@@ -147,9 +147,16 @@ export default function TagWebsite() {
 
   // 初始化示例数据
   useEffect(() => {
-    fetch("/api/tags")
+    fetch('/api/tags')
       .then((res) => res.json())
-      .then((data) => setTags(data))
+      .then((data) => {
+        const parsedTags = data.map((tag: any) => ({
+          ...tag,
+          createdAt: new Date(tag.createdAt),
+          updatedAt: new Date(tag.updatedAt),
+        }))
+        setTags(parsedTags)
+      })
   }, [])
 
   const filteredTags = tags.filter((tag) => {
