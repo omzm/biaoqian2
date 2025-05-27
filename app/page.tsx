@@ -164,7 +164,7 @@ export default function TagWebsite() {
       tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tag.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === "all" || tag.category === selectedCategory
-    const matchesStatus = showInactive || tag.isActive
+    const matchesStatus = showInactive || tag.isActive !== false
     return matchesSearch && matchesCategory && matchesStatus
   })
 
