@@ -470,7 +470,7 @@ export default function TagWebsite() {
     const updated = {
       ...tag,
       clickCount: (tag.clickCount || 0) + 1,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     }
 
     console.log("点击更新标签：", updated)
