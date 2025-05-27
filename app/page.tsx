@@ -147,85 +147,9 @@ export default function TagWebsite() {
 
   // 初始化示例数据
   useEffect(() => {
-    const sampleTags: TagItem[] = [
-      {
-        id: "1",
-        name: "React",
-        description: "现代前端框架，构建用户界面的JavaScript库",
-        category: "技术",
-        color: "0",
-        url: "https://react.dev",
-        favicon: "https://react.dev/favicon.ico",
-        isActive: true,
-        clickCount: 156,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "2",
-        name: "GitHub",
-        description: "全球最大的代码托管平台，开发者协作的首选工具",
-        category: "技术",
-        color: "7",
-        url: "https://github.com",
-        favicon: "https://github.com/favicon.ico",
-        isActive: true,
-        clickCount: 178,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "3",
-        name: "设计灵感",
-        description: "收集优秀的UI/UX设计案例和创意灵感",
-        category: "工作",
-        color: "2",
-        favicon: "/placeholder.svg?height=32&width=32&query=Design icon",
-        isActive: true,
-        clickCount: 89,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "4",
-        name: "健身计划",
-        description: "健康生活方式，运动健身相关的应用和资源",
-        category: "生活",
-        color: "1",
-        url: "https://example.com/fitness",
-        favicon: "/placeholder.svg?height=32&width=32&query=Fitness icon",
-        isActive: false,
-        clickCount: 23,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "5",
-        name: "学习笔记",
-        description: "知识管理和学习资源整理",
-        category: "学习",
-        color: "4",
-        favicon: "/placeholder.svg?height=32&width=32&query=Study icon",
-        isActive: true,
-        clickCount: 134,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "6",
-        name: "音乐播放",
-        description: "音乐流媒体平台和播放工具",
-        category: "娱乐",
-        color: "3",
-        url: "https://music.example.com",
-        favicon: "/placeholder.svg?height=32&width=32&query=Music icon",
-        isActive: true,
-        clickCount: 201,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]
-    setTags(sampleTags)
+    fetch("/api/tags")
+      .then((res) => res.json())
+      .then((data) => setTags(data))
   }, [])
 
   const filteredTags = tags.filter((tag) => {
