@@ -21,27 +21,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Tag,
-  Hash,
-  Sparkles,
-  Filter,
-  Shield,
-  ShieldCheck,
-  Link,
-  TrendingUp,
-  Globe,
-  Loader2,
-  AlertCircle,
-  CheckCircle,
-  Upload,
-  RefreshCw,
-  X,
-} from "lucide-react"
+import { Plus, Search, Edit, Trash2, Tag, Hash, Sparkles, Filter, Shield, ShieldCheck, Link, TrendingUp, Globe, Loader2, AlertCircle, CheckCircle, Upload, RefreshCw, X } from 'lucide-react'
 
 interface TagItem {
   id: string
@@ -901,61 +881,30 @@ export default function HomeClient() {
           {popularTags.length === 0 ? (
             <p className="text-sm text-slate-400">暂无热门标签</p>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              {popularTags.map((tag, index) => {
-                const colorClasses = getColorClasses(tag.color)
-                return (
-                  <Card
-                    key={tag.id}
-                    className="group border-0 shadow-md hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden cursor-pointer hover:-translate-y-0.5"
-                    onClick={() => handleClick(tag)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div className="relative">
-                          <div className={`absolute inset-0 ${colorClasses.bg} rounded-lg blur opacity-20`} />
-                          <div className="relative w-8 h-8 bg-white rounded-lg border flex items-center justify-center">
-                            {tag.favicon ? (
-                              tag.favicon.length <= 4 ? (
-                                <span className="text-sm">{tag.favicon}</span>
-                              ) : (
-                                <img
-                                  src={tag.favicon || "/placeholder.svg"}
-                                  alt={tag.name}
-                                  className="w-5 h-5"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.src = "/placeholder.svg?height=20&width=20&query=Website icon"
-                                  }}
-                                />
-                              )
-                            ) : (
-                              <div className={`w-3 h-3 rounded-full ${colorClasses.bg}`} />
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-slate-900 truncate text-sm">{tag.name}</h3>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Badge
-                              variant="secondary"
-                              className={`${colorClasses.light} ${colorClasses.text} border-0 text-xs px-2 py-0.5`}
-                            >
-                              {tag.category}
-                            </Badge>
-                            <span className="text-xs text-slate-500">#{index + 1}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="truncate">{tag.clickCount} 次点击</span>
-                        <TrendingUp className="h-3 w-3 text-orange-500" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+  {popularTags.map((tag) => (
+    <Card
+      key={tag.id}
+      onClick={() => handleClick(tag)}
+      className="flex items-center gap-2 p-2 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+    >
+      <CardContent className="p-3">
+        <div className="flex items-center gap-2">
+          <img
+            src={tag.favicon || '/placeholder.svg'}
+            alt={tag.name}
+            className="w-4 h-4 rounded-sm object-cover flex-shrink-0"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.src = '/placeholder.svg'
+            }}
+          />
+          <span className="text-sm font-medium truncate">{tag.name}</span>
+        </div>
+      </CardContent>
+    </Card>
+  ))}
+</div>
           )}
         </div>
 
