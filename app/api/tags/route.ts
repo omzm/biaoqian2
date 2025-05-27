@@ -7,18 +7,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json()
+  try {
+    const data = await request.json()
+    console.log("Received data:", data)
 
-  const { id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt } = data
+    const { id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt } = data
 
-  await db.query(
-    `INSERT INTO tags (id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-     ON CONFLICT (id) DO UPDATE SET
-       name = $2, description = $3, category = $4, color = $5,
-       url = $6, favicon = $7, isActive = $8, clickCount = $9, updatedAt = $11`,
-    [id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt],
-  )
+    await db.query(
+      `INSERT INTO tags (id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       ON CONFLICT (id) DO UPDATE SET
+         name = $2, description = $3, category = $4, color = $5,
+         url = $6, favicon = $7, isActive = $8, clickCount = $9, updatedAt = $11`,
+      [id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt],
+    )
 
-  return NextResponse.json({ status: "ok" })
+    return NextResponse.json({ status: "ok" })
+  } catch (err) {
+    console.error("API POST error:", err)
+    return NextResponse.json({ status: "error", error: err }, { status: 500 })
+  }
 }
