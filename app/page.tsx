@@ -1,6 +1,5 @@
-"use client"
-
 export const revalidate = 10
+;("use client")
 
 import type React from "react"
 
