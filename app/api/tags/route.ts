@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import db from "@/lib/db"
+import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     await db.query(
       `INSERT INTO tags (id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (id) DO UPDATE SET
          name = $2, description = $3, category = $4, color = $5,
          url = $6, favicon = $7, isActive = $8, clickCount = $9, updatedAt = $11`,
