@@ -146,12 +146,13 @@ export default function TagWebsite() {
     fetch("/api/tags")
       .then((res) => res.json())
       .then((data) => {
-        const parsedTags = data.map((tag: any) => ({
+        const parsed = data.map((tag: any) => ({
           ...tag,
-          createdAt: new Date(tag.createdAt),
-          updatedAt: new Date(tag.updatedAt),
+          clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0"),
+          createdAt: tag.createdAt ? new Date(tag.createdAt) : null,
+          updatedAt: tag.updatedAt ? new Date(tag.updatedAt) : null,
         }))
-        setTags(parsedTags)
+        setTags(parsed)
       })
   }, [])
 
@@ -467,13 +468,18 @@ export default function TagWebsite() {
   }
 
   const handleClick = async (tag: TagItem) => {
+    const now = new Date().toISOString()
+
+    // 第一步：从数据库重新获取标签（确保 clickCount 是最新的）
+    const res = await fetch(`/api/tags/${tag.id}`)
+    const data = await res.json()
+    const currentCount = data.clickCount || 0
+
     const updated = {
       ...tag,
-      clickCount: (tag.clickCount || 0) + 1,
-      updatedAt: new Date().toISOString(),
+      clickCount: currentCount + 1,
+      updatedAt: now,
     }
-
-    console.log("点击更新标签：", updated)
 
     await fetch("/api/tags", {
       method: "POST",
