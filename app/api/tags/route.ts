@@ -35,9 +35,8 @@ export async function DELETE(request: Request) {
   try {
     const { id } = await request.json()
     await db.query("DELETE FROM tags WHERE id = $1", [id])
-    return NextResponse.json({ status: "ok" })
+    return NextResponse.json({ status: "deleted" })
   } catch (err) {
-    console.error("删除标签出错:", err)
     return NextResponse.json({ status: "error", message: err.message }, { status: 500 })
   }
 }
