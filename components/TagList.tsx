@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Badge } from "@/components/ui/card"
-import { TrendingUp, Eye, EyeOff, Edit, Trash2, Link } from "lucide-react"
+import { TrendingUp, Eye, EyeOff, Edit, Trash2, Link } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import type { TagItem } from "@/types"
 
@@ -33,17 +33,17 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
         {popularTags.length === 0 ? (
           <p className="text-sm text-slate-400">暂无热门标签</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
   {popularTags.map((tag) => (
     <div
       key={tag.id}
       onClick={() => onClick(tag)}
-      className="flex items-center gap-3 p-3 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition"
+      className="flex items-center gap-2 p-2 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
     >
       <img
         src={tag.favicon || "/placeholder.svg"}
         alt={tag.name}
-        className="w-5 h-5 rounded-sm object-cover"
+        className="w-4 h-4 rounded-sm object-cover flex-shrink-0"
         onError={(e) => {
           const target = e.target as HTMLImageElement
           target.src = "/placeholder.svg"
@@ -172,7 +172,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center space-x-2">
                       <div className="text-xs text-slate-500 bg-slate-50 px-3 py-1 rounded-full">
-                        {typeof tag.clickCount === "number" ? tag.clickCount : 0} 次点击
+                        {tag.clickCount} 次点击
                       </div>
                       {isAdmin && <Link className="h-3 w-3 text-orange-500" />}
                     </div>
