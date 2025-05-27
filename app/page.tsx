@@ -19,7 +19,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Plus,
@@ -33,8 +32,6 @@ import {
   Shield,
   ShieldCheck,
   Link,
-  Eye,
-  EyeOff,
   TrendingUp,
   Globe,
   Loader2,
@@ -128,7 +125,6 @@ export default function TagWebsite() {
   const [editingTag, setEditingTag] = useState<TagItem | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminPassword, setAdminPassword] = useState("")
-  const [showInactive, setShowInactive] = useState(false)
   const [isLoadingWebsite, setIsLoadingWebsite] = useState(false)
   const [fetchStatus, setFetchStatus] = useState<"idle" | "success" | "error">("idle")
   const [iconMethod, setIconMethod] = useState<"auto" | "upload" | "url">("auto")
@@ -164,15 +160,11 @@ export default function TagWebsite() {
       tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tag.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === "all" || tag.category === selectedCategory
-    const matchesStatus = showInactive || tag.isActive !== false
-    return matchesSearch && matchesCategory && matchesStatus
+    return matchesSearch && matchesCategory
   })
 
-  // 获取热门标签（按点击次数排序，只显示前5个活跃标签）
-  const popularTags = tags
-    .filter((tag) => tag.isActive)
-    .sort((a, b) => b.clickCount - a.clickCount)
-    .slice(0, 5)
+  // 获取热门标签（按点击次数排序，只显示前5个标签）
+  const popularTags = tags.sort((a, b) => b.clickCount - a.clickCount).slice(0, 5)
 
   // 标准化URL格式
   const normalizeUrl = (input: string): string => {
@@ -368,8 +360,10 @@ export default function TagWebsite() {
     }
   }
 
-  const handleAdminLogin = () => {
-    if (adminPassword === "admin123") {
+  const handleAdminLogin = async () => {
+    const res = await fetch("/api/admin-password")
+    const { password } = await res.json()
+    if (adminPassword === password) {
       setIsAdmin(true)
       setIsAdminDialogOpen(false)
       setAdminPassword("")
@@ -380,7 +374,6 @@ export default function TagWebsite() {
 
   const handleAdminLogout = () => {
     setIsAdmin(false)
-    setShowInactive(false)
   }
 
   const handleSubmit = async () => {
@@ -473,21 +466,6 @@ export default function TagWebsite() {
     setTags(tags.filter((tag) => tag.id !== id))
   }
 
-  const toggleTagStatus = async (id: string) => {
-    const tag = tags.find((t) => t.id === id)
-    if (!tag) return
-
-    const updatedTag = { ...tag, isActive: !tag.isActive, updatedAt: new Date() }
-
-    await fetch("/api/tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedTag),
-    })
-
-    setTags(tags.map((t) => (t.id === id ? updatedTag : t)))
-  }
-
   const handleClick = async (tag: TagItem) => {
     const updated = {
       ...tag,
@@ -510,9 +488,6 @@ export default function TagWebsite() {
   const getColorClasses = (colorIndex: string) => {
     return colors[Number.parseInt(colorIndex)] || colors[0]
   }
-
-  const activeTags = tags.filter((tag) => tag.isActive)
-  const activeCategories = new Set(activeTags.map((tag) => tag.category))
 
   return (
     <div className="bg-slate-50">
@@ -542,14 +517,6 @@ export default function TagWebsite() {
                   <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-xl">
                     <ShieldCheck className="h-4 w-4 text-green-600" />
                     <span className="text-sm font-medium text-green-700">管理员模式</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={showInactive}
-                      onCheckedChange={setShowInactive}
-                      className="data-[state=checked]:bg-orange-500"
-                    />
-                    <span className="text-sm text-slate-600">显示已禁用</span>
                   </div>
                   <Button variant="outline" onClick={handleAdminLogout} className="rounded-xl">
                     退出管理
@@ -825,16 +792,6 @@ export default function TagWebsite() {
                             className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
                           />
                         </div>
-
-                        <div className="flex items-center space-x-2 p-4 bg-orange-50 rounded-xl">
-                          <Switch
-                            checked={formData.isActive}
-                            onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-                          />
-                          <Label className="text-sm font-medium text-orange-700">
-                            启用标签 {!formData.isActive && "(禁用后用户无法看到此标签)"}
-                          </Label>
-                        </div>
                       </div>
                       <DialogFooter className="gap-3">
                         <Button variant="outline" onClick={resetForm} className="rounded-xl">
@@ -1044,9 +1001,7 @@ export default function TagWebsite() {
               return (
                 <Card
                   key={tag.id}
-                  className={`group border-0 shadow-lg hover:shadow-2xl transition-all duration-300 backdrop-blur-sm rounded-2xl overflow-hidden hover:-translate-y-1 ${
-                    tag.isActive ? "bg-white/80 cursor-pointer" : "bg-slate-100/80"
-                  }`}
+                  className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-300 backdrop-blur-sm rounded-2xl overflow-hidden hover:-translate-y-1 bg-white/80 cursor-pointer"
                   onClick={() => handleClick(tag)}
                 >
                   <CardHeader className="pb-4">
@@ -1070,43 +1025,17 @@ export default function TagWebsite() {
                               )}
                             </div>
                           ) : (
-                            <div
-                              className={`w-4 h-4 rounded-full ${colorClasses.bg} shadow-sm ${!tag.isActive ? "opacity-50" : ""}`}
-                            />
+                            <div className={`w-4 h-4 rounded-full ${colorClasses.bg} shadow-sm`} />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle
-                            className={`text-xl font-bold transition-colors ${
-                              tag.isActive ? "text-slate-900 group-hover:text-slate-700" : "text-slate-500"
-                            }`}
-                          >
+                          <CardTitle className="text-xl font-bold transition-colors text-slate-900 group-hover:text-slate-700">
                             {tag.name}
                           </CardTitle>
-                          {!tag.isActive && (
-                            <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs mt-1">
-                              已禁用
-                            </Badge>
-                          )}
                         </div>
                       </div>
                       {isAdmin && (
                         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleTagStatus(tag.id)
-                            }}
-                            className={`h-8 w-8 rounded-lg ${
-                              tag.isActive
-                                ? "hover:bg-red-50 hover:text-red-600"
-                                : "hover:bg-green-50 hover:text-green-600"
-                            }`}
-                          >
-                            {tag.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -1134,19 +1063,13 @@ export default function TagWebsite() {
                     </div>
                     <Badge
                       variant="secondary"
-                      className={`w-fit ${colorClasses.light} ${colorClasses.text} border-0 rounded-lg px-3 py-1 font-medium ${
-                        !tag.isActive ? "opacity-50" : ""
-                      }`}
+                      className={`w-fit ${colorClasses.light} ${colorClasses.text} border-0 rounded-lg px-3 py-1 font-medium`}
                     >
                       {tag.category}
                     </Badge>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <CardDescription
-                      className={`leading-relaxed ${tag.isActive ? "text-slate-600" : "text-slate-400"}`}
-                    >
-                      {tag.description}
-                    </CardDescription>
+                    <CardDescription className="leading-relaxed text-slate-600">{tag.description}</CardDescription>
 
                     <div className="flex items-center justify-between pt-2">
                       <div className="flex items-center space-x-2">
@@ -1174,14 +1097,7 @@ export default function TagWebsite() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-sm font-medium text-blue-700">总标签数</CardTitle>
-                  <div className="text-3xl font-bold text-blue-900 mt-2">
-                    {showInactive ? tags.length : activeTags.length}
-                  </div>
-                  {isAdmin && showInactive && (
-                    <div className="text-xs text-blue-600 mt-1">
-                      活跃: {activeTags.length} | 禁用: {tags.length - activeTags.length}
-                    </div>
-                  )}
+                  <div className="text-3xl font-bold text-blue-900 mt-2">{tags.length}</div>
                 </div>
                 <div className="p-3 bg-blue-500 rounded-xl">
                   <Hash className="h-6 w-6 text-white" />
@@ -1196,7 +1112,7 @@ export default function TagWebsite() {
                 <div>
                   <CardTitle className="text-sm font-medium text-emerald-700">分类数量</CardTitle>
                   <div className="text-3xl font-bold text-emerald-900 mt-2">
-                    {showInactive ? new Set(tags.map((tag) => tag.category)).size : activeCategories.size}
+                    {new Set(tags.map((tag) => tag.category)).size}
                   </div>
                 </div>
                 <div className="p-3 bg-emerald-500 rounded-xl">
