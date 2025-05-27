@@ -10,10 +10,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
-    console.log("收到标签数据:", data)
-
-    const { id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt } = data
+    const { id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt } =
+      await request.json()
 
     await db.query(
       `INSERT INTO tags (id, name, description, category, color, url, favicon, isActive, clickCount, createdAt, updatedAt)
@@ -26,8 +24,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ status: "ok" })
   } catch (err) {
-    console.error("写入数据库出错:", err)
-    return NextResponse.json({ status: "error", message: err.message }, { status: 500 })
+    console.error("写入失败：", err)
+    return NextResponse.json({ status: "error", error: err.message }, { status: 500 })
   }
 }
 
