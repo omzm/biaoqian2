@@ -875,7 +875,7 @@ export default function TagWebsite() {
                 placeholder="搜索标签名称或描述..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 rounded-2xl border-slate-200 bg-white/80 backdrop-blur-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
+                className="pl-12 h-12 rounded-2xl border-slate-200 bg-white/80 backdrop-blur-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div className="relative">

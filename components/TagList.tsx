@@ -208,7 +208,11 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                     </div>
 
                     <div className="text-xs text-slate-500 bg-slate-50 px-3 py-1 rounded-full">
-                      {tag.createdAt.toLocaleDateString("zh-CN")}
+                      <span className="text-xs text-slate-500">
+                        {tag.createdAt instanceof Date && !isNaN(tag.createdAt.getTime())
+                          ? tag.createdAt.toLocaleDateString("zh-CN")
+                          : "未知时间"}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
