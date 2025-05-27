@@ -551,13 +551,12 @@ export default function TagWebsite() {
   const activeCategories = new Set(activeTags.map((tag) => tag.category))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="bg-slate-50">
       {/* Header */}
-      <header className="relative bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-purple-50/50" />
+      <header className="relative bg-white border-b border-slate-200/60 sticky top-0 z-50">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+            <div className="flex items-center space-x-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-75" />
                 <div className="relative p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl">
@@ -572,10 +571,10 @@ export default function TagWebsite() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* 管理员功能 */}
               {isAdmin ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-3 w-full lg:w-auto">
                   <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-xl">
                     <ShieldCheck className="h-4 w-4 text-green-600" />
                     <span className="text-sm font-medium text-green-700">管理员模式</span>
@@ -937,7 +936,7 @@ export default function TagWebsite() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Search and Filter */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -984,7 +983,7 @@ export default function TagWebsite() {
               TOP 5
             </Badge>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {popularTags.map((tag, index) => {
               const colorClasses = getColorClasses(tag.color)
               return (
@@ -1071,7 +1070,7 @@ export default function TagWebsite() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {filteredTags.map((tag) => {
               const colorClasses = getColorClasses(tag.color)
               return (
@@ -1201,7 +1200,7 @@ export default function TagWebsite() {
         )}
 
         {/* Stats - 移到底部 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl overflow-hidden">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
