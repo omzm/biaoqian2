@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
+import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -116,8 +117,19 @@ const colors = [
   },
 ]
 
+const fetchTags = async (): Promise<TagItem[]> => {
+  const res = await fetch("/api/tags")
+  const data = await res.json()
+  return data.map((tag: any) => ({
+    ...tag,
+    clickCount: typeof tag.clickcount === "number" ? tag.clickcount : Number.parseInt(tag.clickcount || "0"),
+    createdAt: tag.createdat ? new Date(tag.createdat) : new Date(),
+    updatedAt: tag.updatedat ? new Date(tag.updatedat) : new Date(),
+  }))
+}
+
 export default function TagWebsite() {
-  const [tags, setTags] = useState<TagItem[]>([])
+  const { data: tags = [], mutate: refreshTags } = useSWR("/api/tags", fetchTags)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -141,34 +153,6 @@ export default function TagWebsite() {
     isActive: true,
   })
 
-  const refreshTags = async () => {
-    const res = await fetch("/api/tags")
-    const data = await res.json()
-    const parsed = data.map((tag: any) => ({
-      ...tag,
-      clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0"),
-      createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
-      updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
-    }))
-    setTags(parsed)
-  }
-
-  // 初始化示例数据
-  useEffect(() => {
-    fetch("/api/tags")
-      .then((res) => res.json())
-      .then((data) => {
-        const parsed = data.map((tag: any) => ({
-          ...tag,
-          // 手动映射小写字段 clickcount → camelCase
-          clickCount: typeof tag.clickcount === "number" ? tag.clickcount : Number.parseInt(tag.clickcount || "0", 10),
-          createdAt: tag.createdat && !isNaN(Date.parse(tag.createdat)) ? new Date(tag.createdat) : null,
-          updatedAt: tag.updatedat && !isNaN(Date.parse(tag.updatedat)) ? new Date(tag.updatedat) : null,
-        }))
-        setTags(parsed)
-      })
-  }, [])
-
   const filteredTags = tags.filter((tag) => {
     const matchesSearch =
       tag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,7 +162,7 @@ export default function TagWebsite() {
   })
 
   // 获取热门标签（按点击次数排序，只显示前5个标签）
-  const popularTags = tags.sort((a, b) => b.clickCount - a.clickCount).slice(0, 5)
+  const popularTags = [...tags].sort((a, b) => b.clickCount - a.clickCount).slice(0, 5)
 
   // 标准化URL格式
   const normalizeUrl = (input: string): string => {
@@ -415,11 +399,8 @@ export default function TagWebsite() {
       body: JSON.stringify(newTag),
     })
 
-    if (editingTag) {
-      setTags(tags.map((tag) => (tag.id === editingTag.id ? newTag : tag)))
-    } else {
-      setTags([...tags, newTag])
-    }
+    // 刷新数据
+    refreshTags()
 
     resetForm()
   }
@@ -477,24 +458,23 @@ export default function TagWebsite() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     })
-    setTags(tags.filter((tag) => tag.id !== id))
+
+    // 刷新数据
+    refreshTags()
   }
 
   const handleClick = async (tag: TagItem) => {
-    // 打开链接（不拦截）
     if (tag.url) {
       window.open(tag.url, "_blank", "noopener,noreferrer")
     }
 
-    // 发请求：让数据库执行 clickCount + 1
     await fetch("/api/click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: tag.id }),
     })
 
-    // 数据更新后立即重新拉取数据库数据
-    await refreshTags()
+    refreshTags()
   }
 
   const getColorClasses = (colorIndex: string) => {
