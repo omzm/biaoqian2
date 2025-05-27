@@ -155,7 +155,17 @@ export default function TagWebsite() {
 
   // 初始化示例数据
   useEffect(() => {
-    refreshTags()
+    fetch("/api/tags")
+      .then((res) => res.json())
+      .then((data) => {
+        const parsed = data.map((tag: any) => ({
+          ...tag,
+          clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0", 10),
+          createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
+          updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
+        }))
+        setTags(parsed)
+      })
   }, [])
 
   const filteredTags = tags.filter((tag) => {

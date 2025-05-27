@@ -76,7 +76,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                       </div>
                     </div>
                     <div className="text-xs text-slate-500 flex justify-between">
-                      <span>{tag.clickCount} 次点击</span>
+                      <span>{typeof tag.clickCount === "number" ? tag.clickCount : 0} 次点击</span>
                       <TrendingUp className="h-3 w-3 text-orange-500" />
                     </div>
                   </CardContent>
@@ -202,7 +202,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center space-x-2">
                       <div className="text-xs text-slate-500 bg-slate-50 px-3 py-1 rounded-full">
-                        {tag.clickCount} 次点击
+                        {typeof tag.clickCount === "number" ? tag.clickCount : 0} 次点击
                       </div>
                       {isAdmin && <Link className="h-3 w-3 text-orange-500" />}
                     </div>
