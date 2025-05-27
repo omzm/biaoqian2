@@ -488,21 +488,23 @@ export default function TagWebsite() {
     setTags(tags.map((t) => (t.id === id ? updatedTag : t)))
   }
 
-  const handleTagClick = async (tag: TagItem) => {
-    if (tag.url && tag.isActive) {
-      // 增加点击次数
-      const updatedTag = { ...tag, clickCount: tag.clickCount + 1, updatedAt: new Date() }
-
-      await fetch("/api/tags", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTag),
-      })
-
-      setTags(tags.map((t) => (t.id === tag.id ? updatedTag : t)))
-      // 打开链接
-      window.open(tag.url, "_blank", "noopener,noreferrer")
+  const handleClick = async (tag: TagItem) => {
+    const updated = {
+      ...tag,
+      clickCount: (tag.clickCount || 0) + 1,
+      updatedAt: new Date(),
     }
+
+    console.log("点击更新标签：", updated)
+
+    await fetch("/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    })
+
+    setTags(tags.map((t) => (t.id === tag.id ? updated : t)))
+    window.open(tag.url, "_blank")
   }
 
   const getColorClasses = (colorIndex: string) => {
@@ -955,7 +957,7 @@ export default function TagWebsite() {
                   <Card
                     key={tag.id}
                     className="group border-0 shadow-md hover:shadow-lg transition-all duration-200 bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden cursor-pointer hover:-translate-y-0.5"
-                    onClick={() => handleTagClick(tag)}
+                    onClick={() => handleClick(tag)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3 mb-2">
@@ -1045,7 +1047,7 @@ export default function TagWebsite() {
                   className={`group border-0 shadow-lg hover:shadow-2xl transition-all duration-300 backdrop-blur-sm rounded-2xl overflow-hidden hover:-translate-y-1 ${
                     tag.isActive ? "bg-white/80 cursor-pointer" : "bg-slate-100/80"
                   }`}
-                  onClick={() => handleTagClick(tag)}
+                  onClick={() => handleClick(tag)}
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between mb-3">
