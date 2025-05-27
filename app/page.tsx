@@ -467,28 +467,26 @@ export default function TagWebsite() {
     setTags(tags.filter((tag) => tag.id !== id))
   }
 
-  const handleClick = async (tag: TagItem) => {
-    const now = new Date().toISOString()
-
-    // 第一步：从数据库重新获取标签（确保 clickCount 是最新的）
-    const res = await fetch(`/api/tags/${tag.id}`)
-    const data = await res.json()
-    const currentCount = data.clickCount || 0
-
-    const updated = {
-      ...tag,
-      clickCount: currentCount + 1,
-      updatedAt: now,
+  const handleClick = (tag: TagItem) => {
+    // 立即打开链接（确保在用户点击事件中执行）
+    if (tag.url) {
+      window.open(tag.url, "_blank", "noopener,noreferrer")
     }
 
-    await fetch("/api/tags", {
+    // 异步更新点击次数（不阻塞跳转）
+    const updated = {
+      ...tag,
+      clickCount: (tag.clickCount || 0) + 1,
+      updatedAt: new Date().toISOString(),
+    }
+
+    fetch("/api/tags", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
+    }).then(() => {
+      setTags((prev) => prev.map((t) => (t.id === tag.id ? updated : t)))
     })
-
-    setTags(tags.map((t) => (t.id === tag.id ? updated : t)))
-    window.open(tag.url, "_blank")
   }
 
   const getColorClasses = (colorIndex: string) => {
