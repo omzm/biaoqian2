@@ -160,9 +160,10 @@ export default function TagWebsite() {
       .then((data) => {
         const parsed = data.map((tag: any) => ({
           ...tag,
-          clickCount: typeof tag.clickCount === "number" ? tag.clickCount : Number.parseInt(tag.clickCount || "0", 10),
-          createdAt: tag.createdAt && !isNaN(Date.parse(tag.createdAt)) ? new Date(tag.createdAt) : null,
-          updatedAt: tag.updatedAt && !isNaN(Date.parse(tag.updatedAt)) ? new Date(tag.updatedAt) : null,
+          // 手动映射小写字段 clickcount → camelCase
+          clickCount: typeof tag.clickcount === "number" ? tag.clickcount : Number.parseInt(tag.clickcount || "0", 10),
+          createdAt: tag.createdat && !isNaN(Date.parse(tag.createdat)) ? new Date(tag.createdat) : null,
+          updatedAt: tag.updatedat && !isNaN(Date.parse(tag.updatedat)) ? new Date(tag.updatedat) : null,
         }))
         setTags(parsed)
       })
