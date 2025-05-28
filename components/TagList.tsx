@@ -1,8 +1,9 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Badge } from "@/components/ui/card"
-import { TrendingUp, Eye, EyeOff, Edit, Trash2, Link } from 'lucide-react'
+import { TrendingUp, Eye, EyeOff, Edit, Trash2, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import dayjs from "dayjs"
 import type { TagItem } from "@/types"
 
 interface Props {
@@ -17,7 +18,11 @@ interface Props {
 }
 
 export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete, onToggle, getColorClasses }: Props) {
-  const activeTags = tags.filter((tag) => tag.isActive)
+  // Sort tags by createdAt ascending (earliest first)
+  const sortedTags = [...tags].sort((a, b) => {
+    if (!a.createdAt || !b.createdAt) return 0
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  })
 
   return (
     <>
@@ -34,48 +39,47 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
           <p className="text-sm text-slate-400">暂无热门标签</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-  {popularTags.map((tag) => (
-    <div
-      key={tag.id}
-      onClick={() => onClick(tag)}
-      className="flex items-center gap-2 p-2 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
-    >
-      <img
-        src={tag.favicon || "/placeholder.svg"}
-        alt={tag.name}
-        className="w-4 h-4 rounded-sm object-cover flex-shrink-0"
-        onError={(e) => {
-          const target = e.target as HTMLImageElement
-          target.src = "/placeholder.svg"
-        }}
-      />
-      <span className="text-sm font-medium truncate">{tag.name}</span>
-    </div>
-  ))}
-</div>
-
+            {popularTags.map((tag) => (
+              <div
+                key={tag.id}
+                onClick={() => onClick(tag)}
+                className="flex items-center gap-2 p-3 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+              >
+                <img
+                  src={tag.favicon || "/placeholder.svg"}
+                  alt={tag.name}
+                  className="w-4 h-4 rounded-sm object-cover flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    target.src = "/placeholder.svg"
+                  }}
+                />
+                <span className="text-sm font-medium truncate flex-1">{tag.name}</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       {/* 主标签列表 */}
-      {tags.length === 0 ? (
+      {sortedTags.length === 0 ? (
         <div className="text-center py-10 text-slate-400">暂无标签，请添加</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {tags.map((tag) => {
+          {sortedTags.map((tag) => {
             const colorClasses = getColorClasses(tag.color)
             return (
               <Card
                 key={tag.id}
-                className={`group border-0 shadow-lg hover:shadow-2xl transition-all duration-300 backdrop-blur-sm rounded-2xl overflow-hidden hover:-translate-y-1 ${
+                className={`group border-0 shadow-lg hover:shadow-2xl transition-all duration-300 backdrop-blur-sm rounded-2xl overflow-hidden hover:-translate-y-1 h-fit ${
                   tag.isActive ? "bg-white/80 cursor-pointer" : "bg-slate-100/80"
                 }`}
                 onClick={() => onClick(tag)}
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="relative">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <div className="relative flex-shrink-0">
                         {tag.favicon ? (
                           <div className="w-10 h-10 bg-white rounded-xl border shadow-sm flex items-center justify-center">
                             {tag.favicon.length <= 4 ? (
@@ -100,7 +104,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                       </div>
                       <div className="flex-1 min-w-0">
                         <CardTitle
-                          className={`text-xl font-bold transition-colors ${
+                          className={`text-xl font-bold transition-colors truncate ${
                             tag.isActive ? "text-slate-900 group-hover:text-slate-700" : "text-slate-500"
                           }`}
                         >
@@ -114,7 +118,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                       </div>
                     </div>
                     {isAdmin && (
-                      <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -165,7 +169,11 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                   </Badge>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <CardDescription className={`leading-relaxed ${tag.isActive ? "text-slate-600" : "text-slate-400"}`}>
+                  <CardDescription
+                    className={`leading-relaxed overflow-hidden whitespace-pre-wrap line-clamp-2 ${
+                      tag.isActive ? "text-slate-600" : "text-slate-400"
+                    }`}
+                  >
                     {tag.description}
                   </CardDescription>
 
@@ -175,6 +183,14 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
                         {tag.clickCount} 次点击
                       </div>
                       {isAdmin && <Link className="h-3 w-3 text-orange-500" />}
+                    </div>
+
+                    <div className="text-xs text-slate-500 bg-slate-50 px-3 py-1 rounded-full">
+                      <span className="text-xs text-slate-500">
+                        {tag.updatedAt instanceof Date && !isNaN(tag.updatedAt.getTime())
+                          ? dayjs(tag.updatedAt).format("YYYY-MM-DD")
+                          : "未知时间"}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
