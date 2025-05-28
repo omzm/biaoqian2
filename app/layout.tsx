@@ -1,15 +1,19 @@
-// app/layout.tsx
-
-mport type { Metadata } from 'next'
+import type { Metadata } from 'next'
 import './globals.css'
-export const metadata = {
-  title: "标签管理器 - 智能数字书签系统",
-  description: "一个帮助你智能管理数字书签与标签的小工具",
+
+export const metadata: Metadata = {
+  title: '常用网站',
+  description: 'Created with v0',
+  generator: '常用网站',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="zh-CN">
+    <html lang="en">
       <body>{children}</body>
     </html>
   )
