@@ -187,7 +187,6 @@ export function TagEditor(props: Props) {
               <Tabs value={iconMethod} onValueChange={(v) => setIconMethod(v as any)}>
                 <TabsList className="grid grid-cols-3">
                   <TabsTrigger value="auto">自动</TabsTrigger>
-                  <TabsTrigger value="upload">上传</TabsTrigger>
                   <TabsTrigger value="url">链接</TabsTrigger>
                 </TabsList>
 
@@ -206,41 +205,6 @@ export function TagEditor(props: Props) {
                     </Button>
                   </div>
                 </TabsContent>
-
-                <TabsContent value="upload">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUploadWrapper}
-                    className="hidden"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-20 border-dashed border-2"
-                  >
-                    <Upload className="h-5 w-5 text-slate-400" />
-                    上传图标（PNG/JPG）
-                  </Button>
-                  {uploadedIcon && (
-                    <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                      <img src={uploadedIcon || "/placeholder.svg"} className="w-6 h-6" alt="uploaded icon" />
-                      <span className="text-sm text-green-700 flex-1">图片上传成功</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearIcon}
-                        className="text-red-500"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  )}
-                </TabsContent>
-
                 <TabsContent value="url">
                   <Input
                     value={customIconUrl}

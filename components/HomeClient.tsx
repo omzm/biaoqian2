@@ -44,7 +44,7 @@ interface WebsiteInfo {
   url: string
 }
 
-const categories = ["工作", "学习", "娱乐", "技术", "生活", "其他"]
+const categories = ["工具", "论坛", "娱乐", "技术", "主机", "云盘"]
 
 const colors = [
   {
@@ -286,33 +286,6 @@ export default function HomeClient() {
         url: websiteInfo.url,
       }))
       setIconMethod("auto")
-    }
-  }
-
-  // 处理文件上传
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // 检查文件类型
-      if (!file.type.startsWith("image/")) {
-        alert("请选择图片文件")
-        return
-      }
-
-      // 检查文件大小 (限制为2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert("图片文件大小不能超过2MB")
-        return
-      }
-
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setUploadedIcon(result)
-        setFormData((prev) => ({ ...prev, favicon: result }))
-        setIconMethod("upload")
-      }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -590,9 +563,6 @@ export default function HomeClient() {
                               <TabsTrigger value="auto" className="text-xs">
                                 自动获取
                               </TabsTrigger>
-                              <TabsTrigger value="upload" className="text-xs">
-                                上传图片
-                              </TabsTrigger>
                               <TabsTrigger value="url" className="text-xs">
                                 图标链接
                               </TabsTrigger>
@@ -613,47 +583,6 @@ export default function HomeClient() {
                                     <RefreshCw className="h-3 w-3 mr-1" />
                                     重新获取
                                   </Button>
-                                )}
-                              </div>
-                            </TabsContent>
-
-                            <TabsContent value="upload" className="space-y-3">
-                              <div className="space-y-2">
-                                <input
-                                  ref={fileInputRef}
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={handleFileUpload}
-                                  className="hidden"
-                                />
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => fileInputRef.current?.click()}
-                                  className="w-full rounded-xl border-dashed border-2 h-20 flex flex-col items-center justify-center space-y-2"
-                                >
-                                  <Upload className="h-5 w-5 text-slate-400" />
-                                  <span className="text-sm text-slate-600">点击上传图片</span>
-                                  <span className="text-xs text-slate-400">支持 JPG, PNG, GIF (最大2MB)</span>
-                                </Button>
-                                {uploadedIcon && (
-                                  <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
-                                    <img
-                                      src={uploadedIcon || "/placeholder.svg"}
-                                      alt="uploaded"
-                                      className="w-6 h-6 rounded"
-                                    />
-                                    <span className="text-sm text-green-700 flex-1">图片上传成功</span>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={clearIcon}
-                                      className="h-6 w-6 p-0 text-red-500 hover:text-red-600"
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </Button>
-                                  </div>
                                 )}
                               </div>
                             </TabsContent>

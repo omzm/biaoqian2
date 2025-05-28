@@ -43,7 +43,7 @@ export function TagList({ tags, popularTags, isAdmin, onClick, onEdit, onDelete,
               <div
                 key={tag.id}
                 onClick={() => onClick(tag)}
-                className="flex items-center gap-2 p-3 rounded-lg border bg-white shadow hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border shadow hover:shadow-md cursor-pointer transition-all duration-200"
               >
                 <img
                   src={tag.favicon || "/placeholder.svg"}
